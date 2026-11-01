@@ -52,9 +52,11 @@ declare global {
 }
 
 export async function startMocks() {
+  performance.mark('mocks:start')
   const { resetRequested } = loadConfig()
   await initDb(resetRequested)
   resumeSettlements()
+  performance.mark('mocks:db-ready')
 
   const worker = setupWorker(...handlers)
   await worker.start({
@@ -62,6 +64,7 @@ export async function startMocks() {
     onUnhandledRequest: 'bypass',
     serviceWorker: { url: `${import.meta.env.BASE_URL}mockServiceWorker.js` },
   })
+  performance.mark('mocks:worker-ready')
 
   window.__kurioMock = {
     getConfig,

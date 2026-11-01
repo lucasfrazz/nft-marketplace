@@ -39,8 +39,7 @@ test.describe('Catálogo', () => {
 
     // Ordenação
     if (!isMobile) {
-      await page.getByTestId('sort-trigger').click()
-      await page.getByTestId('sort-price-desc').click()
+      await page.getByTestId('sort-select').selectOption('price-desc')
       await expect(page).toHaveURL(/sort=price-desc/)
       await expect(page.getByTestId('catalog-grid')).toBeVisible()
       const p = await prices(page)

@@ -40,7 +40,9 @@ export function NftRail({ items, loading, label }: { items?: NftSummary[]; loadi
       {pages > 1 && (
         <div className="mt-6 flex justify-center gap-2" role="group" aria-label={`Páginas de ${label}`}>
           {Array.from({ length: pages }, (_, i) => (
-            <button key={i} type="button" onClick={() => go(i)} aria-label={`Ir para o grupo ${i + 1}`} aria-pressed={i === page} className={cn('size-3 rounded-full border border-copper', i === page && 'bg-copper')} />
+            <button key={i} type="button" onClick={() => go(i)} aria-label={`Ir para o grupo ${i + 1}`} aria-pressed={i === page} className="grid size-6 place-items-center rounded-full">
+              <span aria-hidden className={cn('size-3 rounded-full border border-copper', i === page && 'bg-copper')} />
+            </button>
           ))}
         </div>
       )}

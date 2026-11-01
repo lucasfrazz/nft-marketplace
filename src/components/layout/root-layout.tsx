@@ -49,7 +49,7 @@ export function RootLayout() {
   }, [pathname])
 
   return (
-    <div className="min-h-dvh px-4 md:px-8">
+    <div className="min-h-dvh overflow-x-clip px-4 md:px-8">
       <a href="#conteudo" className="sr-only z-50 rounded bg-copper px-3 py-2 text-ink focus:not-sr-only focus:fixed focus:top-2 focus:left-2">
         Pular para o conteúdo
       </a>
@@ -59,7 +59,7 @@ export function RootLayout() {
           Reconectando ao tempo real… os dados serão sincronizados ao voltar.
         </p>
       )}
-      <main id="conteudo" tabIndex={-1} className="mx-auto w-full max-w-[1200px] outline-none">
+      <main id="conteudo" tabIndex={-1} className="mx-auto min-h-[calc(100dvh-69px)] w-full max-w-[1200px] outline-none">
         <Outlet />
       </main>
       <SiteFooter />

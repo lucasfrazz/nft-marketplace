@@ -62,6 +62,13 @@ test.describe('Acessibilidade e teclado', () => {
         const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)
         expect(overflow, `${path} @ ${width}px`).toBeLessThanOrEqual(0)
       }
+      // Carrinho com itens
+      await page.goto('/nft/emerald-ape-042')
+      await page.getByRole('button', { name: width < 768 ? 'Comprar NFT' : 'COMPRAR', exact: true }).filter({ visible: true }).click()
+      await expect(page).toHaveURL(/carrinho/)
+      await expect(page.getByTestId('summary-total')).toBeVisible()
+      const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)
+      expect(overflow, `carrinho com itens @ ${width}px`).toBeLessThanOrEqual(0)
     }
   })
 })

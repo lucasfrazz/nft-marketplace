@@ -1,8 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate, useSearch } from '@tanstack/react-router'
-import { ArrowRight, ChevronLeft, ChevronRight, Search, SlidersHorizontal } from 'lucide-react'
+import { ArrowRight, ChevronDown, ChevronLeft, ChevronRight, Search, SlidersHorizontal } from 'lucide-react'
 import type { CatalogTab, CatalogSort, HighlightsResponse } from '@/api/contracts'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
 import { EmptyState, ErrorState, Skeleton } from '@/components/common'
 import { NftCard, NftCardSkeleton } from '@/components/nft-card'
@@ -74,7 +73,9 @@ function Hero({ data }: { data?: HighlightsResponse }) {
           {slides.length > 1 && (
             <div className="mb-4 flex gap-2" role="group" aria-label="Destaques">
               {slides.map((s, i) => (
-                <button key={s.id} type="button" onClick={() => setIndex(i)} aria-label={`Mostrar ${s.name}`} aria-pressed={i === index} className={cn('size-2.5 rounded-full', i === index ? 'bg-copper' : 'bg-copper/40')} />
+                <button key={s.id} type="button" onClick={() => setIndex(i)} aria-label={`Mostrar ${s.name}`} aria-pressed={i === index} className="grid size-6 place-items-center rounded-full">
+                  <span aria-hidden className={cn('size-2.5 rounded-full', i === index ? 'bg-copper' : 'bg-copper/40')} />
+                </button>
               ))}
             </div>
           )}
@@ -189,22 +190,26 @@ function SearchField({ id, search, onChange, className }: { id: string; search: 
 }
 
 function SortSelect({ search, onChange }: { search: CatalogSearch; onChange: (p: Partial<CatalogSearch>) => void }) {
+  // <select> nativo: acessível por padrão e sem custo de JS no carregamento inicial.
   return (
-    <div className="flex items-center gap-1 text-[15px] text-cream">
-      <span id="sort-label">Ordenar por:</span>
-      <Select value={search.sort ?? 'recent'} onValueChange={(v) => onChange({ sort: v === 'recent' ? undefined : (v as CatalogSort) })}>
-        <SelectTrigger aria-labelledby="sort-label" className="h-8 border-none bg-transparent px-1 text-[15px] text-cream shadow-none focus-visible:ring-2" data-testid="sort-trigger">
-          <SelectValue />
-        </SelectTrigger>
-        <SelectContent className="border-line bg-surface">
+    <label className="flex items-center gap-1 text-[15px] text-cream">
+      <span>Ordenar por:</span>
+      <span className="relative">
+        <select
+          value={search.sort ?? 'recent'}
+          onChange={(e) => onChange({ sort: e.target.value === 'recent' ? undefined : (e.target.value as CatalogSort) })}
+          className="h-8 appearance-none rounded-[3px] bg-transparent pr-6 pl-1 text-[15px] text-cream focus-visible:ring-2 focus-visible:ring-copper/60"
+          data-testid="sort-select"
+        >
           {SORTS.map((s) => (
-            <SelectItem key={s.id} value={s.id} data-testid={`sort-${s.id}`}>
+            <option key={s.id} value={s.id} className="bg-surface text-cream">
               {s.label}
-            </SelectItem>
+            </option>
           ))}
-        </SelectContent>
-      </Select>
-    </div>
+        </select>
+        <ChevronDown className="pointer-events-none absolute top-1/2 right-1 size-4 -translate-y-1/2" aria-hidden />
+      </span>
+    </label>
   )
 }
 

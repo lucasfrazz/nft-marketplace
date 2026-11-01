@@ -1,10 +1,13 @@
-import { Link, useLocation, useNavigate } from '@tanstack/react-router'
+import { lazy, Suspense } from 'react'
+import { Link, useLocation } from '@tanstack/react-router'
 import { LogIn, Search, ShoppingCart, User as UserIcon } from 'lucide-react'
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
+import { userMenuTriggerClass } from './user-menu-class'
 import { useCartCount } from '@/features/cart/hooks'
-import { useAuthUser, useLogout } from '@/features/session/hooks'
+import { useAuthUser } from '@/features/session/hooks'
 import { notAvailable } from '@/lib/out-of-scope'
 import { cn } from '@/lib/utils'
+
+const UserMenu = lazy(() => import('./user-menu'))
 
 const navItem = 'relative inline-flex h-[45px] items-start pt-0.5 text-base text-cream transition-colors hover:text-copper-bright'
 const activeBar = 'after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 after:rounded-full after:bg-copper text-copper font-bold'
@@ -13,8 +16,6 @@ export function SiteHeader() {
   const { pathname } = useLocation()
   const user = useAuthUser()
   const count = useCartCount()
-  const navigate = useNavigate()
-  const logout = useLogout()
   const marketActive = /^\/(nft|carrinho|pagamento|pedidos)/.test(pathname)
   const homeActive = !marketActive
 
@@ -57,23 +58,16 @@ export function SiteHeader() {
           </span>
         </Link>
         {user ? (
-          <DropdownMenu>
-            <DropdownMenuTrigger className="flex h-[35px] max-w-36 items-center gap-2 rounded-[3px] border border-copper px-2.5 text-sm text-copper outline-none hover:bg-copper/10" data-testid="user-menu">
-              {user.avatar ? <img src={user.avatar} alt="" className="size-6 rounded-full object-cover" /> : <UserIcon className="size-4" aria-hidden />}
-              <span className="truncate">{user.displayName}</span>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-52 border-line bg-surface">
-              <DropdownMenuLabel className="truncate text-sand">{user.email}</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onSelect={() => navigate({ to: '/conta/perfil' })}>Meu perfil</DropdownMenuItem>
-              <DropdownMenuItem onSelect={() => navigate({ to: '/conta/carteiras' })}>Carteiras</DropdownMenuItem>
-              <DropdownMenuItem onSelect={() => navigate({ to: '/conta/favoritos' })}>Lista de interesse</DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onSelect={() => logout.mutate(undefined, { onSettled: () => navigate({ to: '/' }) })} data-testid="logout">
-                Sair
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <Suspense
+            fallback={
+              <span className={userMenuTriggerClass} aria-hidden>
+                <UserIcon className="size-4" />
+                <span className="truncate">{user.displayName}</span>
+              </span>
+            }
+          >
+            <UserMenu user={user} />
+          </Suspense>
         ) : (
           <Link
             to="/entrar"

@@ -17,14 +17,19 @@ export async function open(page: Page, path = '/', opts: { scenarios?: string[];
   if (opts.reset !== false) u.searchParams.set('mock-reset', '1')
   await page.goto(u.pathname + u.search + u.hash)
   await page.waitForFunction(() => !!window.__kurioMock)
+  await page.locator('#conteudo').waitFor({ state: 'attached' })
 }
 
 /** Controle da camada de mocks (MSW) — nunca toca no estado da aplicação. */
+const ready = (page: Page) => page.waitForFunction(() => !!window.__kurioMock)
+
 export const mock = {
-  setScenarios: (page: Page, scenarios: string[]) => page.evaluate((s) => window.__kurioMock!.setConfig({ scenarios: s as never }), scenarios),
-  updateNft: (page: Page, id: string, patch: { price?: string; available?: number; editionId?: string }) => page.evaluate(([i, p]) => window.__kurioMock!.updateNft(i, p), [id, patch] as const),
-  orders: (page: Page) => page.evaluate(() => Object.values(window.__kurioMock!.snapshot().orders)),
-  connections: (page: Page) => page.evaluate(() => window.__kurioMock!.connectionCount()),
+  ready,
+  setScenarios: async (page: Page, scenarios: string[]) => (await ready(page), page.evaluate((s) => window.__kurioMock!.setConfig({ scenarios: s as never }), scenarios)),
+  updateNft: async (page: Page, id: string, patch: { price?: string; available?: number; editionId?: string }) => (await ready(page), page.evaluate(([i, p]) => window.__kurioMock!.updateNft(i, p), [id, patch] as const)),
+  orders: async (page: Page) => (await ready(page), page.evaluate(() => Object.values(window.__kurioMock!.snapshot().orders))),
+  connections: async (page: Page) => (await ready(page), page.evaluate(() => window.__kurioMock!.connectionCount())),
+  run: async <T>(page: Page, fn: () => T) => (await ready(page), page.evaluate(fn)),
 }
 
 export async function login(page: Page, user = ANA) {

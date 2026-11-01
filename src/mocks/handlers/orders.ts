@@ -57,7 +57,7 @@ export function settleOrder(orderId: string, forced?: Exclude<OrderStatus, 'pend
   order.version++
   order.updatedAt = new Date().toISOString()
   if (status === 'confirmed') {
-    const hash = `0x${randomId()}${randomId()}${randomId()}`.slice(0, 66).padEnd(66, 'a')
+    const hash = `0x${[...crypto.getRandomValues(new Uint8Array(32))].map((b) => b.toString(16).padStart(2, "0")).join("")}`
     order.transaction = { hash, explorerUrl: `/explorer/tx/${hash}` }
     // Remove do carrinho apenas os itens/quantidades comprados.
     const cart = db.carts[userCartId(order.userId)]

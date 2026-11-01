@@ -17,10 +17,11 @@ const PROVIDER_OPTIONS = (Object.keys(PROVIDER_LABEL) as WalletProvider[]).map((
 
 export function WalletsPage() {
   const wallets = useWallets()
+  const profile = useProfile()
   const save = useSaveWallet()
   const [showSecondary, setShowSecondary] = useState(false)
 
-  if (wallets.isPending)
+  if (wallets.isPending || profile.isPending)
     return (
       <div className="grid gap-6 sm:grid-cols-2" aria-busy="true" aria-label="Carregando carteiras">
         {Array.from({ length: 10 }, (_, i) => (
@@ -42,7 +43,7 @@ export function WalletsPage() {
             <p className="text-[13px] text-sand">Estas carteiras ficam disponíveis no pagamento e para receber NFTs comprados.</p>
           </div>
         </div>
-        <WalletFormView slot="primary" wallet={primary} key={`p-${primary?.version ?? 0}`} />
+        <WalletFormView slot="primary" wallet={primary} key="primary" />
       </section>
 
       <section aria-labelledby="secondary-title">
@@ -79,7 +80,7 @@ export function WalletsPage() {
         {secondarySameAsPrimary && primary ? (
           <p className="mt-2 text-[15px] text-sand">Usando a carteira principal ({shortAddress(primary.address)}).</p>
         ) : secondary || showSecondary ? (
-          <WalletFormView slot="secondary" wallet={secondarySameAsPrimary ? null : secondary} key={`s-${secondary?.version ?? 0}`} />
+          <WalletFormView slot="secondary" wallet={secondarySameAsPrimary ? null : secondary} key="secondary" />
         ) : (
           <p className="mt-2 text-[15px] text-sand">{primary ? 'Você ainda não adicionou uma carteira secundária.' : 'Cadastre a carteira principal primeiro.'}</p>
         )}

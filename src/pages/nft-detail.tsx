@@ -95,9 +95,9 @@ function DetailView({ nft }: { nft: NftDetail }) {
         </button>
       </div>
 
-      <div className="mt-3 grid gap-6 md:grid-cols-[100px_395px_1fr] md:gap-6 lg:gap-[26px]">
+      <div className="mt-3 grid gap-6 lg:grid-cols-[100px_395px_1fr] lg:gap-[26px]">
         {/* Miniaturas */}
-        <ul className="hidden flex-col gap-4 md:flex" aria-label="Galeria">
+        <ul className="hidden flex-col gap-4 lg:flex" aria-label="Galeria">
           {nft.gallery.map((art, i) => (
             <li key={i}>
               <button type="button" onClick={() => setActiveImage(i)} aria-pressed={activeImage === i} aria-label={`Imagem ${i + 1} de ${nft.gallery.length}`} className={cn('block overflow-hidden rounded-[6px] border-2', activeImage === i ? 'border-copper' : 'border-transparent')}>
@@ -302,8 +302,8 @@ function DetailSkeleton() {
   return (
     <div className="pt-7" aria-busy="true" aria-label="Carregando NFT" data-testid="detail-skeleton">
       <Skeleton className="hidden h-5 w-40 md:block" />
-      <div className="mt-3 grid gap-6 md:grid-cols-[100px_395px_1fr]">
-        <div className="hidden flex-col gap-4 md:flex">
+      <div className="mt-3 grid gap-6 lg:grid-cols-[100px_395px_1fr]">
+        <div className="hidden flex-col gap-4 lg:flex">
           {[0, 1, 2, 3].map((i) => (
             <Skeleton key={i} className="aspect-square w-full" />
           ))}

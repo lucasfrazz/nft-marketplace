@@ -20,11 +20,11 @@ export function SiteHeader() {
 
   return (
     <header className="mx-auto hidden w-full max-w-[1200px] items-start justify-between border-b border-line pt-3 md:flex" style={{ minHeight: 69 }}>
-      <Link to="/" className="mt-2 w-40 text-sm font-bold tracking-[0.1em] text-cream" aria-label="Kurio — página inicial">
+      <Link to="/" className="mt-2 text-sm font-bold lg:w-40 tracking-[0.1em] text-cream" aria-label="Kurio — página inicial">
         KURIO
       </Link>
 
-      <nav aria-label="Principal" className="flex gap-9">
+      <nav aria-label="Principal" className="flex gap-5 lg:gap-9">
         <Link to="/" className={cn(navItem, homeActive && activeBar)} aria-current={homeActive ? 'page' : undefined}>
           Início
         </Link>
@@ -39,7 +39,7 @@ export function SiteHeader() {
         </button>
       </nav>
 
-      <div className="flex w-52 items-center justify-end gap-5">
+      <div className="flex items-center justify-end gap-3 lg:w-52 lg:gap-5">
         <Link
           to="/"
           hash="catalogo"

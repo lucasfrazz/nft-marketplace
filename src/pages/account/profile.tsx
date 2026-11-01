@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { ImageIcon, Loader2 } from 'lucide-react'
@@ -23,7 +23,7 @@ export function ProfilePage() {
       </div>
     )
   if (profile.isError) return <ErrorState message={profile.error.message} onRetry={() => void profile.refetch()} />
-  return <ProfileFormView key={profile.data.version} />
+  return <ProfileFormView key={profile.data.id} />
 }
 
 function ProfileFormView() {
@@ -43,7 +43,6 @@ function ProfileFormView() {
   })
   const { register, handleSubmit, formState, setError, reset } = form
   const e = formState.errors
-  useEffect(() => setStatus(null), [formState.isDirty])
 
   const onSubmit = handleSubmit(async (v) => {
     setStatus(null)

@@ -19,7 +19,7 @@ const SOCIAL = [
 
 export function WalletBadges({ className = '' }: { className?: string }) {
   return (
-    <span className={`inline-flex items-center gap-2 rounded-[3px] border border-line-strong bg-band px-2.5 py-1 text-[9px] font-bold tracking-[0.01em] text-copper-bright ${className}`}>
+    <span className={`inline-flex flex-wrap items-center gap-2 rounded-[3px] border border-line-strong bg-band px-2.5 py-1 text-[9px] font-bold tracking-[0.01em] text-copper-bright ${className}`}>
       METAMASK <span aria-hidden>·</span> WALLETCONNECT <span aria-hidden>·</span> COINBASE
     </span>
   )
@@ -34,9 +34,9 @@ export function SiteFooter() {
   }
   return (
     <footer className="mx-auto mt-20 w-full max-w-[1200px] pb-28 md:mt-28 md:pb-6">
-      <div className="grid gap-8 bg-surface px-6 py-8 md:grid-cols-[1fr_1fr_1fr_1.35fr] md:gap-0 md:px-12">
+      <div className="grid gap-8 bg-surface px-6 py-8 md:grid-cols-2 lg:grid-cols-[1fr_1fr_1fr_1.35fr] lg:gap-0 lg:px-12">
         {FEATURES.map((f) => (
-          <div key={f.letter} className="md:border-r md:border-copper/70 md:px-6 md:first:pl-0">
+          <div key={f.letter} className="lg:border-r lg:border-copper/70 lg:px-6 lg:first:pl-0">
             <span aria-hidden className="grid size-[74px] place-items-center rounded-full bg-copper text-2xl font-bold text-ink">
               {f.letter}
             </span>
@@ -44,7 +44,7 @@ export function SiteFooter() {
             <p className="mt-2 text-[15px] leading-[22px] text-sand-2">{f.body}</p>
           </div>
         ))}
-        <form onSubmit={onNewsletter} className="md:pl-4" aria-labelledby="newsletter-title">
+        <form onSubmit={onNewsletter} className="lg:pl-4" aria-labelledby="newsletter-title">
           <h2 id="newsletter-title" className="text-lg leading-4 font-bold text-cream">
             Antecipe-se ao próximo lançamento
           </h2>
@@ -95,9 +95,9 @@ export function SiteFooter() {
             ))}
           </ul>
         </nav>
-        <div>
+        <div className="col-span-2 md:col-span-1">
           <h2 className="mb-2 text-lg font-bold text-cream">Redes sociais</h2>
-          <ul className="flex gap-2">
+          <ul className="flex flex-wrap gap-2">
             {SOCIAL.map(({ label, href, Icon }) => (
               <li key={label}>
                 <a href={href} target="_blank" rel="noopener noreferrer" aria-label={`${label} (abre em nova aba)`} className="grid size-[30px] place-items-center rounded-[3px] border border-copper text-copper hover:bg-copper/15">

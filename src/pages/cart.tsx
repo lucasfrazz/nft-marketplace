@@ -52,7 +52,7 @@ export function CartPage() {
           </EmptyState>
         </div>
       ) : (
-        <div className="mt-4 grid gap-8 md:grid-cols-[1fr_332px] md:gap-[86px]">
+        <div className="mt-4 grid gap-8 lg:grid-cols-[1fr_332px] lg:gap-[86px]">
           <section aria-labelledby="cart-items-title">
             <h2 id="cart-items-title" className="sr-only">
               Itens do carrinho
@@ -215,7 +215,7 @@ function CartCard({ item, line }: { item: CartItem; line?: QuoteLine }) {
 
 function CartSkeleton() {
   return (
-    <div className="mt-6 grid gap-8 md:grid-cols-[1fr_332px] md:gap-[86px]" aria-busy="true" aria-label="Carregando carrinho" data-testid="cart-skeleton">
+    <div className="mt-6 grid gap-8 lg:grid-cols-[1fr_332px] lg:gap-[86px]" aria-busy="true" aria-label="Carregando carrinho" data-testid="cart-skeleton">
       <div className="space-y-3">
         {[0, 1, 2].map((i) => (
           <Skeleton key={i} className="h-[70px]" />

@@ -47,6 +47,11 @@ subscribeConfig(() => {
 
 function catalogFaults() {
   if (hasScenario('catalog-error')) throw new HttpError(500, 'INTERNAL', 'Falha ao carregar o catálogo.')
+}
+
+/** `flaky-catalog` afeta somente a listagem (1ª consulta + 2 retries falham). */
+function listFaults() {
+  catalogFaults()
   if (hasScenario('flaky-catalog') && flakyFailures < 3) {
     flakyFailures++
     throw new HttpError(503, 'TRANSIENT', 'Serviço temporariamente indisponível.')
@@ -67,7 +72,7 @@ export const catalogHandlers = [
       const latency = listLatency()
       if (latency !== undefined) await new Promise((r) => setTimeout(r, latency))
       return route(async ({ request }) => {
-        catalogFaults()
+        listFaults()
         const p = new URL(request.url).searchParams
         const fields: Record<string, string> = {}
 

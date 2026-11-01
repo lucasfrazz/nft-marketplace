@@ -257,7 +257,7 @@ function CheckoutView() {
         </div>
       )}
 
-      <form ref={formRef} onSubmit={onSubmit} noValidate className="mt-6 grid gap-10 md:grid-cols-[1fr_405px] md:gap-8 lg:gap-[32px]">
+      <form ref={formRef} onSubmit={onSubmit} noValidate className="mt-6 grid gap-10 lg:grid-cols-[1fr_405px] lg:gap-[32px]">
         {/* Dados do colecionador */}
         <section aria-labelledby="collector-title">
           <h1 id="collector-title" className="text-lg font-bold text-cream">
@@ -485,7 +485,7 @@ function WalletCard({ wallet, active, onSelect }: { wallet: Wallet; active: bool
 
 function CheckoutSkeleton() {
   return (
-    <div className="mt-10 grid gap-8 md:grid-cols-[1fr_405px]" aria-busy="true" aria-label="Carregando pagamento" data-testid="checkout-skeleton">
+    <div className="mt-10 grid gap-8 lg:grid-cols-[1fr_405px]" aria-busy="true" aria-label="Carregando pagamento" data-testid="checkout-skeleton">
       <div className="grid gap-5 sm:grid-cols-2">
         {Array.from({ length: 10 }, (_, i) => (
           <Skeleton key={i} className="h-[66px]" />

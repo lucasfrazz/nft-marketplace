@@ -3,7 +3,7 @@ import { Link, useNavigate, useSearch } from '@tanstack/react-router'
 import { ArrowRight, ChevronLeft, ChevronRight, Search, SlidersHorizontal } from 'lucide-react'
 import type { CatalogTab, CatalogSort, HighlightsResponse } from '@/api/contracts'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet'
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
 import { EmptyState, ErrorState, Skeleton } from '@/components/common'
 import { NftCard, NftCardSkeleton } from '@/components/nft-card'
 import { NftImage } from '@/components/nft-image'
@@ -62,7 +62,7 @@ function Hero({ data }: { data?: HighlightsResponse }) {
       <div className="hidden min-h-[450px] items-center justify-between gap-10 md:flex">
         <div className="max-w-[640px] pl-10">
           <p className="text-sm tracking-[0.1em] text-cream">Bem-vindo à Kurio</p>
-          <h1 id="hero-title" className="mt-5 text-[43px] leading-[70px] font-bold tracking-[0.06em] text-cream">
+          <h1 id="hero-title" className="mt-5 text-[30px] leading-[48px] lg:text-[43px] lg:leading-[70px] font-bold tracking-[0.06em] text-cream">
             SEJA DONO DO FUTURO DA ARTE DIGITAL
           </h1>
           <p className="mt-3 text-[15px] leading-6 text-sand">Descubra NFTs selecionados de criadores emergentes e consagrados. Colecione arte digital rara, apoie artistas e tenha uma parte da cultura da internet.</p>
@@ -78,7 +78,7 @@ function Hero({ data }: { data?: HighlightsResponse }) {
               ))}
             </div>
           )}
-          <div className="w-[450px]">
+          <div className="w-[300px] lg:w-[450px]">
             {current ? (
               <Link to="/nft/$nftId" params={{ nftId: current.id }} aria-label={`Ver ${current.name}`}>
                 <NftImage art={current.image} alt={current.imageAlt} priority width={640} sizes="450px" className="rounded-[16px]" />
@@ -124,10 +124,12 @@ function MobileSearchBar({ search, onChange }: { search: CatalogSearch; onChange
   return (
     <div className="flex gap-2 pt-4 md:hidden">
       <SearchField id="catalog-search-mobile" search={search} onChange={onChange} className="h-[45px] flex-1 rounded-[10px] bg-surface" />
-      <button type="button" onClick={() => setOpen(true)} className="grid size-[45px] place-items-center rounded-[10px] bg-copper text-ink" aria-label="Abrir filtros" data-testid="open-filters">
-        <SlidersHorizontal className="size-5" aria-hidden />
-      </button>
       <Sheet open={open} onOpenChange={setOpen}>
+        <SheetTrigger asChild>
+          <button type="button" className="grid size-[45px] place-items-center rounded-[10px] bg-copper text-ink" aria-label="Abrir filtros" data-testid="open-filters">
+            <SlidersHorizontal className="size-5" aria-hidden />
+          </button>
+        </SheetTrigger>
         <SheetContent side="bottom" className="max-h-[85dvh] overflow-y-auto rounded-t-[24px] border-line bg-surface px-5 pb-8">
           <SheetHeader className="px-0">
             <SheetTitle className="text-cream">Filtros</SheetTitle>
@@ -218,7 +220,7 @@ function Catalog({ search, onChange, featured }: { search: CatalogSearch; onChan
   const hasFilters = !!(search.q || search.col || search.net || search.min || search.max || search.tab)
 
   return (
-    <section id="catalogo" ref={sectionRef} aria-labelledby="catalog-title" className="mt-6 scroll-mt-4 md:mt-24 md:grid md:grid-cols-[310px_1fr] md:gap-12">
+    <section id="catalogo" ref={sectionRef} aria-labelledby="catalog-title" className="mt-6 scroll-mt-4 md:mt-24 md:grid md:grid-cols-[240px_1fr] md:gap-6 lg:grid-cols-[310px_1fr] lg:gap-12">
       <h2 id="catalog-title" className="sr-only">
         Catálogo de NFTs
       </h2>
@@ -246,8 +248,8 @@ function Catalog({ search, onChange, featured }: { search: CatalogSearch; onChan
               </button>
             ))}
           </div>
-          <div className="hidden items-center gap-4 md:flex">
-            <SearchField id="catalog-search" search={search} onChange={onChange} className="h-9 w-56 rounded-[3px] border border-line bg-surface" />
+          <div className="hidden flex-wrap items-center gap-4 md:flex">
+            <SearchField id="catalog-search" search={search} onChange={onChange} className="h-9 w-48 rounded-[3px] border border-line bg-surface lg:w-56" />
             <SortSelect search={search} onChange={onChange} />
           </div>
         </div>
@@ -345,11 +347,11 @@ function FeaturedCard({ nft }: { nft?: HighlightsResponse['featured'] }) {
 
 function Drops({ data }: { data?: HighlightsResponse }) {
   return (
-    <section aria-label="Lançamentos" className="mt-20 hidden gap-8 md:grid md:grid-cols-2">
+    <section aria-label="Lançamentos" className="mt-20 hidden gap-8 md:grid lg:grid-cols-2">
       {data
         ? data.drops.map((d) => (
             <article key={d.id} className="flex overflow-hidden rounded-[6px] bg-surface">
-              <div className="w-[285px] shrink-0">
+              <div className="w-[42%] shrink-0 lg:w-[285px]">
                 <NftImage art={d.image} alt="" width={320} sizes="285px" className="h-full" />
               </div>
               <div className="flex flex-col items-end justify-center gap-3 p-4 text-right">
@@ -374,7 +376,7 @@ function Journal({ data }: { data?: HighlightsResponse }) {
         Diário da Cunhagem
       </h2>
       <p className="mt-2 text-center text-sm text-sand-2">Histórias, guias e insights para colecionadores sobre o universo da propriedade digital.</p>
-      <ul className="mt-10 grid grid-cols-4 gap-6">
+      <ul className="mt-10 grid grid-cols-2 gap-6 lg:grid-cols-4">
         {(data?.journal ?? Array.from({ length: 4 }, (_, i) => ({ id: `s${i}` }) as never)).map((j: HighlightsResponse['journal'][number]) =>
           j.title ? (
             <li key={j.id} className="overflow-hidden rounded-[6px] bg-surface">

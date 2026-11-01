@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect } from 'react'
+import { lazy, Suspense, useEffect, useRef } from 'react'
 import { Outlet, useLocation, useNavigate } from '@tanstack/react-router'
 import { toast } from 'sonner'
 import { Toaster } from '@/components/ui/sonner'
@@ -38,8 +38,13 @@ export function RootLayout() {
     [navigate],
   )
 
-  // Move o foco para o conteúdo principal ao trocar de página (leitores de tela).
+  // Move o foco para o conteúdo principal ao trocar de página (leitores de
+  // tela). No carregamento inicial o foco fica no documento, para que o 1º
+  // Tab alcance o link "Pular para o conteúdo".
+  const lastPath = useRef(pathname)
   useEffect(() => {
+    if (lastPath.current === pathname) return
+    lastPath.current = pathname
     document.getElementById('conteudo')?.focus({ preventScroll: true })
   }, [pathname])
 

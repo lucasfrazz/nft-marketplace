@@ -102,6 +102,34 @@
   }
 }
 
+/* Caixa de seleção circular do layout (borda cobre, marcador interno) */
+@layer components {
+  .check-round {
+    appearance: none;
+    display: inline-grid;
+    place-content: center;
+    width: 1rem;
+    height: 1rem;
+    border: 1.5px solid var(--color-copper);
+    border-radius: 9999px;
+    flex-shrink: 0;
+  }
+  .check-round::before {
+    content: '';
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 9999px;
+    background: var(--color-copper);
+    transform: scale(0);
+  }
+  .check-round:checked::before {
+    transform: scale(1);
+  }
+  .check-round:disabled {
+    opacity: 0.5;
+  }
+}
+
 /* Skeleton com shimmer — respeita prefers-reduced-motion */
 @layer components {
   .shimmer {

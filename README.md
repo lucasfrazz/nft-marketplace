@@ -51,7 +51,7 @@ Definidas em `.env` (versionado, sem segredos; `.env.example` é idêntico):
 | Ana Souza | `ana@kurio.dev` | `Kurio@123` | Com carteiras principal (MetaMask/Ethereum) e secundária (Coinbase/Polygon) |
 | Bruno Lima | `bruno@kurio.dev` | `Kurio@123` | Sem carteiras (para testar o cadastro) |
 
-Senhas são armazenadas no banco simulado apenas como **hash SHA-256 com salt** (nunca em claro).
+Senhas são armazenadas no banco simulado apenas como **hash PBKDF2-SHA256 (210.000 iterações) com salt aleatório** (nunca em claro). Após 5 tentativas erradas, o login daquele e-mail fica bloqueado por 10 minutos.
 
 **Cupons:** `KURIO10` (10%), `GENESIS25` (25%, mínimo 2 ETH), `VERAO2025` (expirado). Qualquer outro código é inválido.
 
@@ -144,7 +144,7 @@ npm run test:e2e:report     # relatório HTML; traces são mantidos nas falhas
 | `13-visual` | Regressão visual de início, detalhe, carrinho e pagamento (desktop e mobile) |
 | `14-security` | Redirect seguro, bloqueio de tentativas, hash de senhas, XSS, validação no servidor, 403 entre usuários, cabeçalhos |
 
-Cada teste parte de estado isolado (contexto novo + `mock-reset`). Eventos de tempo real são disparados pelo servidor simulado e **passam pelo `socket.io-client`**; REST passa pelos handlers MSW. Baselines visuais: `e2e/__screenshots__` (geradas em Windows/Chromium — em outro SO rode `npm run test:e2e:update` uma vez, pois a renderização de fontes difere entre plataformas).
+Cada teste parte de estado isolado (contexto novo + `mock-reset`). Eventos de tempo real são disparados pelo servidor simulado e **passam pelo `socket.io-client`**; REST passa pelos handlers MSW. **Regressão visual entre sistemas operacionais:** a renderização de fontes difere entre Windows, Linux e macOS. Por isso as baselines ficam separadas por sistema em `e2e/__screenshots__/<so>/`, e as versionadas são as de `win32/`. Em Linux ou macOS, a **primeira execução** de `npm run test:e2e` cria automaticamente as baselines daquele sistema (os testes passam) e as execuções seguintes comparam com elas. No CI (`CI=true`), baseline ausente é tratada como falha.
 
 ---
 

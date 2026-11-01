@@ -55,7 +55,7 @@ export function WalletsPage() {
             <label className="flex items-center gap-2 text-[15px] text-cream">
               <input
                 type="checkbox"
-                className="size-4 accent-copper"
+                className="check-round"
                 checked={secondarySameAsPrimary}
                 disabled={!primary || save.isPending}
                 onChange={(ev) => {

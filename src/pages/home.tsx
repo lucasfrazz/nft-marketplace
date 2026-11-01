@@ -105,6 +105,11 @@ function Hero({ data }: { data?: HighlightsResponse }) {
           </div>
           <div className="relative w-[138px] shrink-0">
             {current ? <NftImage art={current.image} alt={current.imageAlt} priority width={320} sizes="140px" className="rounded-[14px]" /> : <Skeleton className="aspect-square w-full rounded-[14px]" />}
+            {slides[1] && (
+              <div className="absolute -bottom-1 -left-3 w-[58px] overflow-hidden rounded-[10px] border-2 border-surface-2">
+                <NftImage art={slides[1].image} alt="" width={160} sizes="58px" />
+              </div>
+            )}
           </div>
         </div>
         <div className="mt-2 flex justify-center gap-1.5" aria-hidden>
@@ -289,7 +294,7 @@ function Catalog({ search, onChange, featured }: { search: CatalogSearch; onChan
           ) : list.data ? (
             <>
               {list.isError && <ErrorState title="Falha ao atualizar" message={list.error.message} onRetry={() => void list.refetch()} retrying={list.isFetching} />}
-              <ul className={cn('grid grid-cols-2 gap-x-4 gap-y-8 transition-opacity lg:grid-cols-3 lg:gap-x-[30px]', list.isPlaceholderData && 'opacity-60')} data-testid="catalog-grid">
+              <ul className={cn('grid grid-cols-2 gap-x-4 gap-y-8 transition-opacity max-md:[&>li:nth-child(even)]:mt-8 lg:grid-cols-3 lg:gap-x-[30px]', list.isPlaceholderData && 'opacity-60')} data-testid="catalog-grid">
                 {list.data.items.map((nft, i) => (
                   <li key={nft.id}>
                     <NftCard nft={nft} priority={i < 3} />

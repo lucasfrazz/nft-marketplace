@@ -52,7 +52,7 @@ function AuthShell({ mode, children }: { mode: Mode; children: ReactNode }) {
               KURIO
             </p>
             <DialogTitle className="mt-14 text-center text-xl font-bold text-cream md:mt-0">
-              <span className="md:hidden">{title}</span>
+              <span className="md:hidden">{mode === 'signup' ? 'Criar perfil de colecionador' : title}</span>
               <span className="hidden md:inline">
                 <Link to="/entrar" search={search} className={cn(mode === 'login' ? 'text-copper' : 'text-cream hover:text-copper')} aria-current={mode === 'login' ? 'page' : undefined}>
                   Entrar
@@ -92,7 +92,7 @@ function AuthShell({ mode, children }: { mode: Mode; children: ReactNode }) {
                 </Link>
               ) : (
                 <Link to="/entrar" search={search}>
-                  Já tem conta? <span className="text-copper">Entrar</span>
+                  Já tem uma conta? <span className="text-copper">Entre</span>
                 </Link>
               )}
             </p>
@@ -190,7 +190,7 @@ export function SignupPage() {
           {(a) => <PasswordInput {...a} autoComplete="new-password" placeholder="Confirmar senha" className={cls} {...register('confirmPassword')} data-testid="signup-confirm" />}
         </Field>
         <button type="submit" disabled={signup.isPending} className="mt-4 flex h-[60px] w-full items-center justify-center gap-2 rounded-[10px] bg-copper text-base font-bold text-ink hover:bg-copper-bright disabled:opacity-60 md:h-[45px] md:rounded-[3px]" data-testid="signup-submit">
-          {signup.isPending && <Loader2 className="size-4 animate-spin" aria-hidden />} Criar conta
+          {signup.isPending && <Loader2 className="size-4 animate-spin" aria-hidden />} <span className="md:hidden">Criar perfil</span><span className="hidden md:inline">Criar conta</span>
         </button>
       </form>
     </AuthShell>

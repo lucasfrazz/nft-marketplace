@@ -34,13 +34,13 @@ export function SiteFooter() {
   }
   return (
     <footer className="mx-auto mt-20 w-full max-w-[1200px] pb-28 md:mt-28 md:pb-6">
-      <div className="grid gap-8 bg-surface px-6 py-8 md:grid-cols-2 lg:grid-cols-[1fr_1fr_1fr_1.35fr] lg:gap-0 lg:px-12">
+      <div className="grid gap-8 bg-surface px-6 py-8 md:grid-cols-2 lg:grid-cols-[1fr_1fr_1fr_1.35fr] lg:gap-0 lg:px-8 xl:grid-cols-[265px_265px_265px_1fr]">
         {FEATURES.map((f) => (
-          <div key={f.letter} className="lg:border-r lg:border-copper/70 lg:px-6 lg:first:pl-0">
+          <div key={f.letter} className="lg:border-r lg:border-copper/70 lg:px-4 lg:first:pl-2">
             <span aria-hidden className="grid size-[74px] place-items-center rounded-full bg-copper text-2xl font-bold text-ink">
               {f.letter}
             </span>
-            <h2 className="mt-3 text-lg font-bold text-cream">{f.title}</h2>
+            <h2 className="mt-3 text-lg font-bold text-cream xl:whitespace-nowrap">{f.title}</h2>
             <p className="mt-2 text-[15px] leading-[22px] text-sand-2">{f.body}</p>
           </div>
         ))}

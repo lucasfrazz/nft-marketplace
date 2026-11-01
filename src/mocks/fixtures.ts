@@ -38,8 +38,8 @@ export interface DbNft extends NftDetail {
 }
 
 /** NFTs do layout (nomes, artes e preços do Figma). */
-const DESIGNED: { name: string; token: string; art: ArtKey; price: string; prev?: string; rare?: boolean; collection: CollectionId; network: Network; trending?: boolean }[] = [
-  { name: 'Emerald Ape', token: '042', art: 'ape-a', price: '1.19', collection: 'arte-digital', network: 'ethereum', trending: true },
+const DESIGNED: { name: string; token: string; art: ArtKey; price: string; prev?: string; rare?: boolean; collection: CollectionId; network: Network; trending?: boolean; rating?: number; reviews?: number }[] = [
+  { name: 'Emerald Ape', token: '042', art: 'ape-a', price: '1.19', collection: 'arte-digital', network: 'ethereum', trending: true, rating: 4.8, reviews: 19 },
   { name: 'Sage Nomad', token: '009', art: 'ape-b', price: '1.69', collection: 'arte-digital', network: 'ethereum', trending: true },
   { name: 'Neon Vessel', token: '552', art: 'ape-c', price: '1.99', prev: '2.29', rare: true, collection: 'colecionaveis', network: 'ethereum' },
   { name: 'Cosmic Bloom', token: '118', art: 'ape-b', price: '1.29', collection: 'generativa', network: 'polygon' },
@@ -92,7 +92,9 @@ function buildNft(i: number, d: (typeof DESIGNED)[number] | null, r: () => numbe
   const collection = d?.collection ?? COLLECTIONS[(i * 5 + Math.floor(r() * 3)) % COLLECTIONS.length].id
   const network = d?.network ?? NETWORKS[Math.floor(r() * 3)].id
   // Preços entre 0.02 e 3.08 ETH, com 2 casas (edição 1/50).
-  const cents = d ? null : 2 + Math.floor(r() * 306)
+  // Faixa do layout: 0,02 a 12,30 ETH (extremos fixos; a sequência do RNG é preservada).
+  const rnd = 2 + Math.floor(r() * 306)
+  const cents = d ? null : i === 9 ? 2 : i === 10 ? 1230 : rnd
   const base = d?.price ?? `${Math.floor(cents! / 100)}.${String(cents! % 100).padStart(2, '0')}`
   const editions = editionsFor(base, r, i % 3 === 0)
   const createdAt = new Date(Date.parse(FIXTURE_NOW) - i * 2.5 * 86400000 - Math.floor(r() * 3600000)).toISOString()
@@ -121,8 +123,8 @@ function buildNft(i: number, d: (typeof DESIGNED)[number] | null, r: () => numbe
     collectionName,
     attributes: [...attrs, ...(d?.rare || i % 11 === 5 ? ['Raro'] : ['Comum'])],
     editions,
-    rating: 4 + Math.round(r() * 10) / 10,
-    reviewsCount: 3 + Math.floor(r() * 40),
+    rating: ((x) => d?.rating ?? x)(4 + Math.round(r() * 10) / 10),
+    reviewsCount: ((x) => d?.reviews ?? x)(3 + Math.floor(r() * 40)),
     contract: `0x${(0x7a42 + i).toString(16).toUpperCase()}...${(0x19e8 + i * 3).toString(16).toUpperCase()}`,
     royaltiesPercent: 5,
     gallery: [art, art, art, art],

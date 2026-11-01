@@ -296,7 +296,7 @@ function CheckoutView() {
             </Field>
           </div>
           <label className={cn('mt-5 flex w-fit items-center gap-2 text-[15px] text-cream', !wallets.secondary && 'opacity-50')}>
-            <input type="checkbox" className="size-4 accent-copper" disabled={!wallets.secondary} {...register('useSecondary')} data-testid="use-secondary" />
+            <input type="checkbox" className="check-round" disabled={!wallets.secondary} {...register('useSecondary')} data-testid="use-secondary" />
             Usar outra carteira?
             {!wallets.secondary && <span className="text-xs text-sand-2">(cadastre uma carteira secundária)</span>}
           </label>
@@ -474,7 +474,7 @@ function WalletCard({ wallet, active, onSelect }: { wallet: Wallet; active: bool
       <input type="radio" name="wallet-slot" checked={active} onChange={onSelect} className="mt-1 size-4 accent-copper" />
       <span className="min-w-0">
         <span className="block text-[15px] font-bold text-cream">
-          {wallet.slot === 'primary' ? 'Principal' : 'Reserva'} · {wallet.nickname}
+          {wallet.nickname || (wallet.slot === 'primary' ? 'Principal' : 'Reserva')}
         </span>
         <span className="block truncate text-sm text-sand">{wallet.ensOrSecondary || shortAddress(wallet.address)}</span>
         <span className="block text-sm text-sand-2">Rede {NETWORK_LABEL[wallet.network]}</span>

@@ -8,7 +8,7 @@ const BASE_URL = process.env.E2E_BASE_URL ?? `http://localhost:${PORT}`
  * - Cada teste roda em um contexto novo (localStorage vazio → banco simulado
  *   reiniciado a partir das fixtures).
  * - Fluxos principais (@main) rodam em desktop e mobile.
- * - Regressão visual (@visual) com baselines versionadas em e2e/__screenshots__.
+ * - Regressão visual (@visual) com baselines versionadas em e2e/__screenshots__/<so>/.
  */
 export default defineConfig({
   testDir: './e2e',
@@ -21,7 +21,10 @@ export default defineConfig({
     timeout: 8_000,
     toHaveScreenshot: { maxDiffPixelRatio: 0.02, animations: 'disabled', caret: 'hide', scale: 'css' },
   },
-  snapshotPathTemplate: '{testDir}/__screenshots__/{projectName}/{testFilePath}/{arg}{ext}',
+  // Baselines visuais por sistema operacional: a renderização de fontes difere entre
+  // Windows, Linux e macOS. Fora do CI, a 1ª execução num SO novo cria as baselines dele.
+  snapshotPathTemplate: '{testDir}/__screenshots__/{platform}/{projectName}/{testFilePath}/{arg}{ext}',
+  updateSnapshots: process.env.CI ? 'none' : 'missing',
   reporter: [['list'], ['html', { outputFolder: 'playwright-report', open: 'never' }]],
   use: {
     baseURL: BASE_URL,

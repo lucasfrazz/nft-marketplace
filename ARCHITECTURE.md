@@ -185,6 +185,7 @@ Com um backend real, o item 1 desaparece e o 2 cai para a latência da rede. Nã
 - **Assets:** as 4 artes e o ícone "Thank you" foram exportados do arquivo Figma pela API (originais em `design/source`, variantes WebP geradas por `npm run images`). Os frames de referência estão em `design/figma-frames`. A fonte Roboto Mono vem de `@fontsource` (local, sem CDN).
 - **Substituições:** os ícones de interface usam `lucide-react`. Os ícones de redes sociais, Google e Facebook são SVGs simplificados próprios, porque o lucide não inclui marcas. O favicon é próprio.
 - **Desvios intencionais:**
+  - **Campo de busca** ao lado de "Ordenar por" no catálogo desktop. O Figma tem só o ícone de lupa no cabeçalho, mas o enunciado exige busca. A lupa do cabeçalho leva a esse campo e foca nele.
   - O formulário de pagamento do desktop tem campos duplicados com a seleção de carteira ("Tipo de carteira" e a lista de carteiras). Os dois ficam sincronizados no mesmo estado.
   - O "Endereço da carteira" é somente leitura e vem da carteira selecionada, para evitar pagar com um endereço não cadastrado.
   - No **Pagamento mobile**, o formulário do colecionador aparece antes da escolha de carteira. O frame mobile não mostra os campos, mas eles são obrigatórios para validar o pedido.

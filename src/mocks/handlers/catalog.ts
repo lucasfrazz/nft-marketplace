@@ -165,7 +165,10 @@ export const catalogHandlers = [
     route(({ params }) => {
       const nft = db.nfts.find((n) => n.id === params.id)
       if (!nft) throw new HttpError(404, 'NOT_FOUND', 'NFT não encontrado.')
-      const related = db.nfts.filter((n) => n.id !== nft.id && (n.collection === nft.collection || n.image === nft.image)).slice(0, 10)
+      // NFTs do layout primeiro (como em "Mais desta coleção" no Figma), depois mesma coleção/arte.
+      const designed = [...db.nfts.slice(3, 9), ...db.nfts.slice(0, 3)]
+      const similar = db.nfts.filter((n) => n.collection === nft.collection || n.image === nft.image)
+      const related = [...new Set([...designed, ...similar])].filter((n) => n.id !== nft.id).slice(0, 10)
       return HttpResponse.json({ items: related.map(toSummary) })
     }),
   ),

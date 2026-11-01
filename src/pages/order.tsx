@@ -7,7 +7,7 @@ import { NftImage } from '@/components/nft-image'
 import { useOrder } from '@/features/orders/hooks'
 import { useRealtimeState } from '@/features/realtime/store'
 import { formatEth } from '@/lib/eth'
-import { formatDate, NETWORK_LABEL, PROVIDER_LABEL, shortAddress } from '@/lib/labels'
+import { formatDate, formatShortDate, NETWORK_LABEL, PROVIDER_LABEL, shortAddress } from '@/lib/labels'
 import { NotFoundPage } from './not-found'
 import thankYou from '@/assets/thank-you.svg'
 
@@ -78,7 +78,7 @@ function Receipt({ order }: { order: Order }) {
           Seus NFTs agora estão na sua carteira
         </h1>
       </div>
-      <dl className="grid grid-cols-2 gap-y-3 border-y border-copper px-6 py-3 text-sm sm:grid-cols-4 sm:divide-x sm:divide-copper">
+      <dl className="grid grid-cols-2 gap-y-3 border-y border-copper px-6 py-3 text-sm whitespace-nowrap sm:grid-cols-[auto_auto_auto_auto] sm:justify-between sm:divide-x sm:divide-copper">
         <div className="sm:pr-3">
           <dt className="font-bold text-sand">ID da transação</dt>
           <dd className="text-sand" data-testid="tx-id">
@@ -87,7 +87,7 @@ function Receipt({ order }: { order: Order }) {
         </div>
         <div className="sm:px-3">
           <dt className="text-sand">Data</dt>
-          <dd className="text-sand">{formatDate(order.updatedAt)}</dd>
+          <dd className="text-sand">{formatShortDate(order.updatedAt)}</dd>
         </div>
         <div className="sm:px-3">
           <dt className="text-sand">Total</dt>

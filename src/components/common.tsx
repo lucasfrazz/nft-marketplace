@@ -71,7 +71,7 @@ export function QuantityStepper({
   size?: 'sm' | 'md'
 }) {
   const btn = cn(
-    'grid place-items-center rounded-full bg-copper text-ink transition hover:bg-copper-bright disabled:cursor-not-allowed disabled:bg-surface-2 disabled:text-sand-2',
+    'grid place-items-center rounded-full bg-copper text-ink transition hover:bg-copper-bright disabled:cursor-not-allowed disabled:opacity-40',
     size === 'sm' ? 'size-[22px]' : 'size-[30px] md:h-[42px] md:w-[30px] md:rounded-[15px]',
   )
   return (

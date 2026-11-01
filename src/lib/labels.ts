@@ -10,6 +10,13 @@ export function shortAddress(addr: string) {
   return addr.length > 12 ? `${addr.slice(0, 6)}…${addr.slice(-4)}` : addr
 }
 
+/** Data no formato do layout: "29 Jul, 2026". */
+export function formatShortDate(iso: string) {
+  const d = new Date(iso)
+  const month = new Intl.DateTimeFormat('pt-BR', { month: 'short' }).format(d).replace('.', '')
+  return `${String(d.getDate()).padStart(2, '0')} ${month[0].toUpperCase()}${month.slice(1)}, ${d.getFullYear()}`
+}
+
 export function formatDate(iso: string) {
   return new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' }).format(new Date(iso))
 }

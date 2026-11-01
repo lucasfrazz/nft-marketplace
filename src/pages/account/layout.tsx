@@ -36,7 +36,11 @@ export function AccountLayout() {
               <MapPin className="size-4" aria-hidden /> Carteiras
             </Link>
           </li>
-          <Soon icon={<ShoppingCart className="size-4" aria-hidden />} label="Atividade" />
+          <li>
+            <Link to="/conta/colecao" className={item} activeProps={active}>
+              <ShoppingCart className="size-4" aria-hidden /> Minha coleção
+            </Link>
+          </li>
           <li>
             <Link to="/conta/favoritos" className={item} activeProps={active}>
               <Heart className="size-4" aria-hidden /> Lista de interesse

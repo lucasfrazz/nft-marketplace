@@ -26,6 +26,16 @@ export function usePendingOrders() {
   })
 }
 
+export function useOrders() {
+  const user = useAuthUser()
+  return useQuery({
+    queryKey: qk.orders(user?.id ?? 'anon'),
+    queryFn: ({ signal }) => ordersApi.list(undefined, { signal }),
+    enabled: !!user,
+    staleTime: 0,
+  })
+}
+
 /* ------------------------------------------------------------------ */
 /* Tentativa de compra (chave de idempotência)                         */
 /* ------------------------------------------------------------------ */

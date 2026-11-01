@@ -191,11 +191,12 @@ Com um backend real, o item 1 desaparece e o 2 cai para a latência da rede. Nã
   - Nos grids de 768 px (tablet), não desenhados, detalhe, carrinho e pagamento passam a ter uma coluna até 1024 px, para não haver overflow.
   - A confirmação do pedido é uma página (`/pedidos/:id`) com o visual do modal do Figma. Assim ela tem URL própria e sobrevive ao refresh.
   - O botão "Ver no Etherscan" abre um **explorador simulado** interno (`/explorer/tx/:hash`), porque a transação não existe em rede real.
+- **Minha coleção** (`/conta/colecao`): não é exigida pelo enunciado. Foi adicionada no lugar de "Atividade" no menu do perfil e lista os NFTs de pedidos confirmados, montados a partir do snapshot de cada pedido, junto com o histórico de pedidos e o link para cada recibo.
 - **Estados não desenhados** (skeletons, erro, vazio, pendente, recusado, avisos de preço, expiração de sessão) seguem a mesma paleta, tipografia e cantos do layout.
 
 ## 12. Fora de escopo e limitações
 
-- **Funções fora de escopo** (Criadores, Aprenda, Atividade, Ofertas, Downloads, Suporte, ajuda, editorial, newsletter, login social, recuperar senha, leitor de QR) informam que não estão disponíveis na demonstração e nunca simulam sucesso. Os links de redes sociais abrem em nova aba.
+- **Funções fora de escopo** (Criadores, Aprenda, Ofertas, Downloads, Suporte, ajuda, editorial, newsletter, login social, recuperar senha, leitor de QR) informam que não estão disponíveis na demonstração e nunca simulam sucesso. Os links de redes sociais abrem em nova aba.
 - **Cada aba tem o próprio servidor simulado.** O estado é compartilhado via `localStorage` só ao recarregar.
 - Avaliações individuais de NFTs não são listadas; só a nota média.
 - As baselines visuais foram geradas em Windows. Em outro sistema operacional, regere uma vez com `npm run test:e2e:update`.

@@ -108,6 +108,12 @@ const walletsRoute = createRoute({
   component: lazyRouteComponent(() => import('@/pages/account/wallets'), 'WalletsPage'),
 })
 
+const collectionRoute = createRoute({
+  getParentRoute: () => accountRoute,
+  path: '/colecao',
+  component: lazyRouteComponent(() => import('@/pages/account/collection'), 'CollectionPage'),
+})
+
 const favoritesRoute = createRoute({
   getParentRoute: () => accountRoute,
   path: '/favoritos',
@@ -123,7 +129,7 @@ const routeTree = rootRoute.addChildren([
   explorerRoute,
   loginRoute,
   signupRoute,
-  accountRoute.addChildren([accountIndexRoute, profileRoute, walletsRoute, favoritesRoute]),
+  accountRoute.addChildren([accountIndexRoute, profileRoute, walletsRoute, collectionRoute, favoritesRoute]),
 ])
 
 export const router = createRouter({

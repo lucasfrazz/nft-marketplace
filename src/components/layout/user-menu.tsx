@@ -20,6 +20,7 @@ export default function UserMenu({ user }: { user: User }) {
         <DropdownMenuSeparator />
         <DropdownMenuItem onSelect={() => navigate({ to: '/conta/perfil' })}>Meu perfil</DropdownMenuItem>
         <DropdownMenuItem onSelect={() => navigate({ to: '/conta/carteiras' })}>Carteiras</DropdownMenuItem>
+        <DropdownMenuItem onSelect={() => navigate({ to: '/conta/colecao' })}>Minha coleção</DropdownMenuItem>
         <DropdownMenuItem onSelect={() => navigate({ to: '/conta/favoritos' })}>Lista de interesse</DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem onSelect={() => logout.mutate(undefined, { onSettled: () => navigate({ to: '/' }) })} data-testid="logout">

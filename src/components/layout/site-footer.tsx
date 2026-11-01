@@ -73,7 +73,7 @@ export function SiteFooter() {
           <h2 id="f-profile" className="mb-2 text-lg font-bold text-cream">Meu perfil</h2>
           <ul className="space-y-1.5">
             <li><Link to="/conta/perfil" className={footLink}>Meu perfil</Link></li>
-            <li><button type="button" className={footLink} onClick={() => notAvailable('Minha coleção')}>Minha coleção</button></li>
+            <li><Link to="/conta/colecao" className={footLink}>Minha coleção</Link></li>
             <li><button type="button" className={footLink} onClick={() => notAvailable('Atividade')}>Atividade</button></li>
             <li><button type="button" className={footLink} onClick={() => notAvailable('Estúdio do criador')}>Estúdio do criador</button></li>
             <li><Link to="/conta/favoritos" className={footLink}>Lista de interesse</Link></li>

@@ -50,6 +50,12 @@ test.describe('Compra completa @main', () => {
     const orders = await mock.orders(page)
     expect(orders).toHaveLength(1)
     expect(orders[0].status).toBe('confirmed')
+
+    // O NFT comprado aparece em "Minha coleção"
+    await page.goto('/conta/colecao')
+    await expect(page.getByTestId('collection-grid')).toContainText('Violet Nomad #314')
+    await expect(page.getByTestId('collection-grid')).toContainText('2 unidades')
+    await expect(page.getByTestId('orders-list')).toContainText('Confirmado')
   })
 
   test('recibo preserva o snapshot mesmo após mudança no catálogo', async ({ page }) => {

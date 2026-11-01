@@ -149,12 +149,15 @@ function Receipt({ order }: { order: Order }) {
         <p className="mt-4 text-center text-sm leading-6 text-sand">
           Transação confirmada na {NETWORK_LABEL[order.network]} (simulação). A propriedade foi transferida para sua carteira conectada ({shortAddress(order.walletAddress)}) e registrada na rede.
         </p>
-        <div className="mt-5 flex justify-center">
+        <div className="mt-5 flex flex-wrap justify-center gap-3">
           {order.transaction && (
             <Link to="/explorer/tx/$hash" params={{ hash: order.transaction.hash }} className="rounded-[3px] bg-copper px-4 py-3 text-base font-bold text-ink hover:bg-copper-bright">
               Ver no Etherscan <span className="sr-only">(explorador simulado)</span>
             </Link>
           )}
+          <Link to="/conta/colecao" className="rounded-[3px] border border-copper px-4 py-3 text-base text-copper hover:bg-copper/10">
+            Ver minha coleção
+          </Link>
         </div>
       </div>
       <div className="h-2.5 bg-copper" aria-hidden />

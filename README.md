@@ -144,7 +144,7 @@ npm run test:e2e:report     # relatório HTML; traces são mantidos nas falhas
 | `13-visual` | Regressão visual de início, detalhe, carrinho e pagamento (desktop e mobile) |
 | `14-security` | Redirect seguro, bloqueio de tentativas, hash de senhas, XSS, validação no servidor, 403 entre usuários, cabeçalhos |
 
-Cada teste parte de estado isolado (contexto novo + `mock-reset`). Eventos de tempo real são disparados pelo servidor simulado e **passam pelo `socket.io-client`**; REST passa pelos handlers MSW. **Regressão visual entre sistemas operacionais:** a renderização de fontes difere entre Windows, Linux e macOS. Por isso as baselines ficam separadas por sistema em `e2e/__screenshots__/<so>/`, e as versionadas são as de `win32/`. Em Linux ou macOS, a **primeira execução** de `npm run test:e2e` cria automaticamente as baselines daquele sistema (os testes passam) e as execuções seguintes comparam com elas. No CI (`CI=true`), baseline ausente é tratada como falha.
+Cada teste parte de estado isolado (contexto novo + `mock-reset`). Eventos de tempo real são disparados pelo servidor simulado e **passam pelo `socket.io-client`**; REST passa pelos handlers MSW. **Regressão visual entre sistemas operacionais:** a renderização de fontes difere entre Windows, Linux e macOS. Por isso as baselines ficam separadas por sistema em `e2e/__screenshots__/<so>/`, e as versionadas são as de `win32/`. Em Linux ou macOS, a **primeira execução** de `npm run test:e2e` cria automaticamente as baselines daquele sistema e os testes passam (`updateSnapshots: 'missing'`, verificado com Playwright 1.64: 1ª execução sem baselines → 8/8 aprovados, código de saída 0). As execuções seguintes comparam com elas. No CI (`CI=true`), baseline ausente é tratada como falha.
 
 ---
 

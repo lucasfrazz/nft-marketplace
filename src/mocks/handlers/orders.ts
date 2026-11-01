@@ -3,7 +3,7 @@ import type { CreateOrderRequest, Order, OrderStatus } from '@/api/contracts'
 import { add } from '@/lib/eth'
 import { consumeScenario, getConfig, hasScenario, sleep } from '../config'
 import { db, randomId, save, type DbOrder } from '../db'
-import { API, HttpError, readJson, requireUser, route, userCartId } from '../http'
+import { API, assertMaxLengths, HttpError, MAX_LEN, readJson, requireUser, route, userCartId } from '../http'
 import { emitNftUpdated, emitOrderUpdated } from '../realtime'
 import { computeQuote, findEdition, hydrateCart } from './cart'
 
@@ -116,6 +116,7 @@ export const orderHandlers = [
         return HttpResponse.json(publicOrder(db.orders[previous.orderId]), { status: 200 })
       }
 
+      assertMaxLengths(body.buyer, { displayName: MAX_LEN.name, username: MAX_LEN.username, profileName: MAX_LEN.name, email: MAX_LEN.email, referralCode: MAX_LEN.code, ensName: MAX_LEN.ens, note: MAX_LEN.note })
       const fields: Record<string, string> = {}
       for (const f of REQUIRED_BUYER) if (!String(body.buyer?.[f] ?? '').trim()) fields[f] = 'Campo obrigatório.'
       if (body.buyer?.email && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(body.buyer.email)) fields.email = 'Informe um e-mail válido.'

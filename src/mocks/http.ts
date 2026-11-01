@@ -5,6 +5,22 @@ import { db, save, type DbUser } from './db'
 
 export const API = (import.meta.env.VITE_API_URL as string | undefined) ?? '/api'
 export const SESSION_TTL_MS = 30 * 60 * 1000
+/** Duração máxima absoluta da sessão, mesmo com uso contínuo. */
+export const SESSION_MAX_AGE_MS = 12 * 60 * 60 * 1000
+
+/** Limites de tamanho dos campos de texto (validados também no servidor). */
+export const MAX_LEN = { email: 254, password: 128, name: 40, username: 20, ens: 64, code: 32, note: 280, address: 100 } as const
+
+/** Rejeita campos de texto acima do limite (422 com erro por campo). */
+export function assertMaxLengths(body: object | null | undefined, limits: Record<string, number>) {
+  const fields: Record<string, string> = {}
+  for (const [k, max] of Object.entries(limits)) {
+    const v = (body as Record<string, unknown> | null | undefined)?.[k]
+    if (v !== undefined && v !== null && typeof v !== 'string') fields[k] = 'Valor inválido.'
+    else if (typeof v === 'string' && v.length > max) fields[k] = `Máximo de ${max} caracteres.`
+  }
+  if (Object.keys(fields).length) throw new HttpError(422, 'VALIDATION_ERROR', 'Verifique os campos destacados.', fields)
+}
 
 export class HttpError extends Error {
   readonly response: Response
@@ -58,7 +74,7 @@ export function optionalUser(request: Request): DbUser | null {
   const token = bearer(request)
   if (!token) return null
   const s = db.sessions[token]
-  if (!s || s.expiresAt < Date.now()) return null
+  if (!s || s.expiresAt < Date.now() || Date.now() - s.createdAt > SESSION_MAX_AGE_MS) return null
   return db.users.find((u) => u.id === s.userId) ?? null
 }
 
@@ -68,7 +84,7 @@ export function requireUser(request: Request): { user: DbUser; token: string } {
   if (!token) throw new HttpError(401, 'UNAUTHENTICATED', 'Faça login para continuar.')
   const s = db.sessions[token]
   if (!s) throw new HttpError(401, 'UNAUTHENTICATED', 'Sessão inválida. Faça login novamente.')
-  if (s.expiresAt < Date.now() || consumeScenario('session-expired')) {
+  if (s.expiresAt < Date.now() || Date.now() - s.createdAt > SESSION_MAX_AGE_MS || consumeScenario('session-expired')) {
     delete db.sessions[token]
     save()
     throw new HttpError(401, 'SESSION_EXPIRED', 'Sua sessão expirou. Entre novamente para continuar.')

@@ -1,8 +1,8 @@
 import { http, HttpResponse } from 'msw'
 import type { AvatarUpdateRequest, FavoritesResponse, Network, PasswordChangeRequest, ProfileUpdateRequest, Wallet, WalletConnectRequest, WalletInput, WalletProvider, WalletSlot, WalletsResponse } from '@/api/contracts'
 import { consumeScenario, hasScenario } from '../config'
-import { db, hashPassword, publicUser, randomId, save } from '../db'
-import { API, HttpError, readJson, requireUser, route } from '../http'
+import { db, hashPassword, newSalt, publicUser, save, verifyPassword } from '../db'
+import { API, assertMaxLengths, HttpError, MAX_LEN, readJson, requireUser, route } from '../http'
 import { toSummary } from './catalog'
 import { validatePassword } from './auth'
 
@@ -24,6 +24,7 @@ function walletsOf(userId: string): WalletsResponse {
 }
 
 function validateWallet(input: Partial<WalletInput>): Record<string, string> {
+  assertMaxLengths(input, { displayName: MAX_LEN.name, nickname: MAX_LEN.name, profileName: MAX_LEN.name, address: MAX_LEN.address, ensOrSecondary: MAX_LEN.address, referralCode: MAX_LEN.code, email: MAX_LEN.email, ensName: MAX_LEN.ens })
   const f: Record<string, string> = {}
   const req = (k: keyof WalletInput, label = 'Campo obrigatório.') => {
     if (!String(input[k] ?? '').trim()) f[k] = label
@@ -85,6 +86,7 @@ export const accountHandlers = [
     route(async ({ request }) => {
       const { user } = requireUser(request)
       const body = await readJson<ProfileUpdateRequest>(request)
+      assertMaxLengths(body, { displayName: MAX_LEN.name, username: MAX_LEN.username, email: MAX_LEN.email, ensName: MAX_LEN.ens, walletNickname: MAX_LEN.name })
       const f: Record<string, string> = {}
       const email = String(body.email ?? '').trim().toLowerCase()
       const username = String(body.username ?? '').trim().toLowerCase()
@@ -132,12 +134,13 @@ export const accountHandlers = [
     route(async ({ request }) => {
       const { user, token } = requireUser(request)
       const body = await readJson<PasswordChangeRequest>(request)
-      if ((await hashPassword(body.currentPassword ?? '', user.salt)) !== user.passwordHash)
+      assertMaxLengths(body, { currentPassword: MAX_LEN.password, newPassword: MAX_LEN.password })
+      if (!(await verifyPassword(user, String(body.currentPassword ?? ''))))
         throw new HttpError(422, 'VALIDATION_ERROR', 'Senha atual incorreta.', { currentPassword: 'Senha atual incorreta.' })
       const err = validatePassword(body.newPassword)
       if (err) throw new HttpError(422, 'VALIDATION_ERROR', err, { newPassword: err })
       if (body.newPassword === body.currentPassword) throw new HttpError(422, 'VALIDATION_ERROR', 'A nova senha deve ser diferente da atual.', { newPassword: 'A nova senha deve ser diferente da atual.' })
-      user.salt = randomId('s_')
+      user.salt = newSalt()
       user.passwordHash = await hashPassword(body.newPassword, user.salt)
       // Encerra as outras sessões do usuário.
       for (const [t, s] of Object.entries(db.sessions)) if (s.userId === user.id && t !== token) delete db.sessions[t]

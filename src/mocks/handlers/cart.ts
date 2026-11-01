@@ -3,7 +3,7 @@ import type { Cart, CartItemInput, Network, Quote, QuoteLine, QuoteRequest } fro
 import { add, compare, fromWei, isZero, mulInt, percentOf, sub, toWei } from '@/lib/eth'
 import { db, randomId, save } from '../db'
 import { COUPONS, NETWORK_FEES, NETWORKS } from '../fixtures'
-import { API, HttpError, readJson, resolveCart, route } from '../http'
+import { API, assertMaxLengths, HttpError, MAX_LEN, readJson, resolveCart, route } from '../http'
 
 export function findEdition(nftId: string, editionId: string) {
   const nft = db.nfts.find((n) => n.id === nftId)
@@ -190,7 +190,9 @@ export const cartHandlers = [
     `${API}/cart/coupon`,
     route(async ({ request }) => {
       const { cart } = resolveCart(request)
-      const { code } = await readJson<{ code: string }>(request)
+      const body = await readJson<{ code: string }>(request)
+      assertMaxLengths(body, { code: MAX_LEN.code })
+      const { code } = body
       if (!code?.trim()) throw new HttpError(422, 'VALIDATION_ERROR', 'Informe um código.', { code: 'Informe um código promocional.' })
       const subtotal = add('0', ...cart.items.map((i) => mulInt(findEdition(i.nftId, i.editionId).edition?.price ?? i.unitPrice, i.quantity)))
       const check = checkCoupon(code, subtotal)

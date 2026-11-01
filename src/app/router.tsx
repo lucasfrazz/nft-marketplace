@@ -12,8 +12,19 @@ function requireAuth({ location }: { location: { href: string } }) {
   }
 }
 
+/**
+ * Destino de retorno após login: aceita apenas caminhos internos da própria
+ * origem (bloqueia "//host", "/\host", esquemas e caracteres de controle).
+ */
 export function safeRedirect(target: unknown): string {
-  return typeof target === 'string' && target.startsWith('/') && !target.startsWith('//') ? target : '/'
+  if (typeof target !== 'string' || target.length > 2048 || !target.startsWith('/') || target.startsWith('//')) return '/'
+  if (/[\\\u0000-\u001f\u007f]/.test(target)) return '/'
+  try {
+    const url = new URL(target, window.location.origin)
+    return url.origin === window.location.origin ? url.pathname + url.search + url.hash : '/'
+  } catch {
+    return '/'
+  }
 }
 
 const rootRoute = createRootRoute({

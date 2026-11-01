@@ -5,6 +5,7 @@ Implementação do desafio frontend **NFT Marketplace** (layout Figma "Frontend 
 - **Aplicação publicada:** https://kurio-nft-marketplace-gamma.vercel.app
 - **Arquitetura, contratos e decisões:** [ARCHITECTURE.md](ARCHITECTURE.md)
 - **Auditoria Lighthouse:** [lighthouse/SUMMARY.md](lighthouse/SUMMARY.md)
+- **Segurança:** [ARCHITECTURE.md › Segurança](ARCHITECTURE.md#14-segurança)
 
 | Stack | |
 | --- | --- |
@@ -122,7 +123,7 @@ Latência: `none`, `realistic` (padrão, 120–350 ms), `slow` (2,5 s), `variabl
 ## Testes E2E (Playwright)
 
 ```bash
-npm run test:e2e            # 61 testes: desktop (1440×900) + mobile (390×844, fluxos @main e @visual)
+npm run test:e2e            # 72 testes: desktop (1440×900) + mobile (390×844, fluxos @main e @visual)
 npm run test:e2e:report     # relatório HTML; traces são mantidos nas falhas
 ```
 
@@ -141,6 +142,7 @@ npm run test:e2e:report     # relatório HTML; traces são mantidos nas falhas
 | `11-a11y` | Teclado, foco em diálogos/drawers, erros associados, overflow em 390/768/1440 |
 | `12-loading` | Skeletons com relógio controlado, falhas 5xx/rede e recuperação |
 | `13-visual` | Regressão visual de início, detalhe, carrinho e pagamento (desktop e mobile) |
+| `14-security` | Redirect seguro, bloqueio de tentativas, hash de senhas, XSS, validação no servidor, 403 entre usuários, cabeçalhos |
 
 Cada teste parte de estado isolado (contexto novo + `mock-reset`). Eventos de tempo real são disparados pelo servidor simulado e **passam pelo `socket.io-client`**; REST passa pelos handlers MSW. Baselines visuais: `e2e/__screenshots__` (geradas em Windows/Chromium — em outro SO rode `npm run test:e2e:update` uma vez, pois a renderização de fontes difere entre plataformas).
 

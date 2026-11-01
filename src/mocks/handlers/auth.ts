@@ -1,8 +1,8 @@
 import { http, HttpResponse } from 'msw'
 import type { LoginRequest, Session, SignupRequest } from '@/api/contracts'
 import { hasScenario } from '../config'
-import { db, hashPassword, publicUser, randomId, save, type DbUser } from '../db'
-import { API, emptyCart, HttpError, readJson, requireUser, route, SESSION_TTL_MS, userCartId } from '../http'
+import { db, hashPassword, newSalt, publicUser, randomId, save, verifyPassword, type DbUser } from '../db'
+import { API, assertMaxLengths, emptyCart, HttpError, MAX_LEN, readJson, requireUser, route, SESSION_TTL_MS, userCartId } from '../http'
 import { dropUserConnections } from '../realtime'
 import { clampQuantity } from './cart'
 
@@ -11,6 +11,7 @@ const USERNAME_RE = /^[a-z0-9._]{3,20}$/
 
 export function validatePassword(pw: string): string | null {
   if (typeof pw !== 'string' || pw.length < 8) return 'A senha deve ter pelo menos 8 caracteres.'
+  if (pw.length > MAX_LEN.password) return `A senha deve ter no máximo ${MAX_LEN.password} caracteres.`
   if (!/[A-Za-z]/.test(pw) || !/\d/.test(pw)) return 'A senha deve conter letras e números.'
   return null
 }
@@ -18,8 +19,27 @@ export function validatePassword(pw: string): string | null {
 function createSession(user: DbUser): Session {
   const token = randomId('tok_') + randomId()
   const expiresAt = Date.now() + SESSION_TTL_MS
-  db.sessions[token] = { userId: user.id, expiresAt }
+  db.sessions[token] = { userId: user.id, expiresAt, createdAt: Date.now() }
   return { token, user: publicUser(user), expiresAt: new Date(expiresAt).toISOString() }
+}
+
+/* Limitação de tentativas de login: 5 falhas por e-mail em 10 min → 429. */
+const MAX_FAILURES = 5
+const FAILURE_WINDOW_MS = 10 * 60 * 1000
+
+function recentFailures(email: string) {
+  const now = Date.now()
+  const list = (db.loginFailures[email] ?? []).filter((t) => now - t < FAILURE_WINDOW_MS)
+  db.loginFailures[email] = list
+  return list
+}
+
+function assertNotLocked(email: string) {
+  const list = recentFailures(email)
+  if (list.length < MAX_FAILURES) return
+  const retryAfter = Math.ceil((list[0] + FAILURE_WINDOW_MS - Date.now()) / 1000)
+  const minutes = Math.max(1, Math.ceil(retryAfter / 60))
+  throw new HttpError(429, 'RATE_LIMITED', `Muitas tentativas de login. Tente novamente em ${minutes} min.`, undefined, { retryAfterSeconds: retryAfter })
 }
 
 /** Mescla o carrinho do visitante no carrinho do usuário (somando quantidades). */
@@ -48,6 +68,7 @@ export const authHandlers = [
     `${API}/auth/signup`,
     route(async ({ request }) => {
       const body = await readJson<SignupRequest>(request)
+      assertMaxLengths(body, { username: MAX_LEN.username, email: MAX_LEN.email, password: MAX_LEN.password, guestCartId: MAX_LEN.code * 2 })
       const fields: Record<string, string> = {}
       const email = String(body.email ?? '').trim().toLowerCase()
       const username = String(body.username ?? '').trim().toLowerCase()
@@ -61,7 +82,7 @@ export const authHandlers = [
       if (db.users.some((u) => u.username === username))
         throw new HttpError(409, 'USERNAME_TAKEN', 'Nome de usuário indisponível.', { username: 'Este nome de usuário já está em uso.' })
 
-      const salt = randomId('s_')
+      const salt = newSalt()
       const user: DbUser = {
         id: randomId('u_'),
         email,
@@ -87,14 +108,22 @@ export const authHandlers = [
     `${API}/auth/login`,
     route(async ({ request }) => {
       const body = await readJson<LoginRequest>(request)
+      assertMaxLengths(body, { email: MAX_LEN.email, password: MAX_LEN.password, guestCartId: MAX_LEN.code * 2 })
       const email = String(body.email ?? '').trim().toLowerCase()
       const fields: Record<string, string> = {}
       if (!EMAIL_RE.test(email)) fields.email = 'Informe um e-mail válido.'
       if (!body.password) fields.password = 'Informe sua senha.'
       if (Object.keys(fields).length) throw new HttpError(422, 'VALIDATION_ERROR', 'Verifique os campos destacados.', fields)
+      assertNotLocked(email)
       const user = db.users.find((u) => u.email === email)
-      if (!user || (await hashPassword(body.password, user.salt)) !== user.passwordHash)
+      const valid = await verifyPassword(user, String(body.password))
+      if (!valid || !user) {
+        recentFailures(email).push(Date.now())
+        save()
+        // Mensagem genérica: não revela se o e-mail existe.
         throw new HttpError(401, 'UNAUTHENTICATED', 'E-mail ou senha incorretos.')
+      }
+      delete db.loginFailures[email]
       mergeGuestCart(user.id, body.guestCartId)
       const session = createSession(user)
       save()

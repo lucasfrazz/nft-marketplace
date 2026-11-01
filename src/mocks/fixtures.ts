@@ -154,7 +154,9 @@ export const SEED_USERS = [
     displayName: 'Ana Souza',
     ensName: 'ana',
     walletNickname: 'Principal',
-    password: 'Kurio@123',
+    // PBKDF2-SHA256 (210k iterações) — a senha de demonstração está documentada no README.
+    salt: 'b07cab53a1bc36d5bd03c6f0026ebb15',
+    passwordHash: '955515fc88a0cfe6d9d5fc3bda39d1c02b1c91fe448b404f53968f3520c41ce6',
   },
   {
     id: 'u_bruno',
@@ -163,7 +165,8 @@ export const SEED_USERS = [
     displayName: 'Bruno Lima',
     ensName: 'bruno',
     walletNickname: 'Cofre',
-    password: 'Kurio@123',
+    salt: '794cf1758487730b4dfa662a70912a5d',
+    passwordHash: 'd6fce75e324034bbf3cb5a9e73a2920bd476baed4180600b433bff2591cb4c14',
   },
 ] as const
 

@@ -3,7 +3,7 @@
  * catálogo, favoritos, carrinho, perfil, carteiras e pedidos — usada tanto
  * pelos handlers REST quanto pelos eventos Socket.IO.
  *
- * Persistência: localStorage (`kurio.mock.db.v1`) para sustentar refresh.
+ * Persistência: localStorage (`kurio.mock.db.v2`) para sustentar refresh.
  * `resetDb()` restaura integralmente o cenário conhecido das fixtures.
  */
 import type { Cart, Order, Quote, User, Wallet, WalletSlot } from '@/api/contracts'
@@ -29,10 +29,13 @@ export interface DbWallets {
 }
 
 export interface DbState {
-  schema: 1
+  schema: 2
   nfts: DbNft[]
   users: DbUser[]
-  sessions: Record<string, { userId: string; expiresAt: number }>
+  /** expiresAt: expiração deslizante; createdAt: base da duração máxima absoluta. */
+  sessions: Record<string, { userId: string; expiresAt: number; createdAt: number }>
+  /** Falhas de login por e-mail (timestamps) — limitação de tentativas. */
+  loginFailures: Record<string, number[]>
   favorites: Record<string, string[]>
   carts: Record<string, Cart>
   wallets: Record<string, DbWallets>
@@ -42,16 +45,36 @@ export interface DbState {
   seq: number
 }
 
-const KEY = 'kurio.mock.db.v1'
+const KEY = 'kurio.mock.db.v2'
 export let db: DbState
 
-export async function sha256(text: string): Promise<string> {
-  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text))
-  return [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, '0')).join('')
+const toHex = (buf: ArrayBuffer | Uint8Array) => [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, '0')).join('')
+
+/**
+ * Hash de senha com PBKDF2-SHA256 (210.000 iterações, recomendação OWASP),
+ * salt aleatório de 16 bytes por usuário. Senhas nunca são armazenadas em claro.
+ */
+export async function hashPassword(password: string, salt: string) {
+  const key = await crypto.subtle.importKey('raw', new TextEncoder().encode(password), 'PBKDF2', false, ['deriveBits'])
+  const bits = await crypto.subtle.deriveBits({ name: 'PBKDF2', hash: 'SHA-256', salt: new TextEncoder().encode(salt), iterations: 210_000 }, key, 256)
+  return toHex(bits)
 }
 
-export async function hashPassword(password: string, salt: string) {
-  return sha256(`${salt}:${password}`)
+export function newSalt() {
+  return toHex(crypto.getRandomValues(new Uint8Array(16)))
+}
+
+/** Comparação em tempo constante (evita vazar informação pelo tempo de resposta). */
+export function safeEqual(a: string, b: string) {
+  let diff = a.length ^ b.length
+  for (let i = 0; i < Math.max(a.length, b.length); i++) diff |= (a.charCodeAt(i) || 0) ^ (b.charCodeAt(i) || 0)
+  return diff === 0
+}
+
+export async function verifyPassword(user: { salt: string; passwordHash: string } | undefined, password: string) {
+  // Sem usuário, calcula um hash mesmo assim: o tempo de resposta não revela se o e-mail existe.
+  const hash = await hashPassword(password, user?.salt ?? 'no-such-user-salt')
+  return !!user && safeEqual(hash, user.passwordHash)
 }
 
 export function randomId(prefix = '') {
@@ -66,7 +89,6 @@ function emptyWallet(slot: WalletSlot, input: NonNullable<(typeof SEED_WALLETS)[
 async function seed(): Promise<DbState> {
   const users: DbUser[] = []
   for (const u of SEED_USERS) {
-    const salt = `salt-${u.id}`
     users.push({
       id: u.id,
       email: u.email,
@@ -76,8 +98,8 @@ async function seed(): Promise<DbState> {
       walletNickname: u.walletNickname,
       avatar: null,
       version: 1,
-      salt,
-      passwordHash: await hashPassword(u.password, salt),
+      salt: u.salt,
+      passwordHash: u.passwordHash,
     })
   }
   const wallets: Record<string, DbWallets> = {}
@@ -89,10 +111,11 @@ async function seed(): Promise<DbState> {
     }
   }
   return {
-    schema: 1,
+    schema: 2,
     nfts: buildNfts(),
     users,
     sessions: {},
+    loginFailures: {},
     favorites: {},
     carts: {},
     wallets,
@@ -109,7 +132,7 @@ export async function initDb(forceReset = false) {
       const raw = localStorage.getItem(KEY)
       if (raw) {
         const parsed = JSON.parse(raw) as DbState
-        if (parsed.schema === 1) {
+        if (parsed.schema === 2) {
           db = parsed
           return
         }

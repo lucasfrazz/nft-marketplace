@@ -1,21 +1,23 @@
 import { z } from 'zod'
 
-const required = (label = 'Campo obrigatório.') => z.string().trim().min(1, label)
+const required = (label = 'Campo obrigatório.') => z.string().trim().min(1, label).max(40, 'Máximo de 40 caracteres.')
 
 export const usernameSchema = z
   .string()
   .trim()
   .min(1, 'Informe o nome de usuário.')
   .regex(/^[a-z0-9._]{3,20}$/, 'Use de 3 a 20 caracteres: letras minúsculas, números, "." ou "_".')
-export const emailSchema = z.string().trim().min(1, 'Informe o e-mail.').email('Informe um e-mail válido.')
+export const emailSchema = z.string().trim().min(1, 'Informe o e-mail.').max(254, 'Máximo de 254 caracteres.').email('Informe um e-mail válido.')
 export const ensSchema = z
   .string()
   .trim()
   .min(1, 'Informe o nome ENS.')
+  .max(64, 'Máximo de 64 caracteres.')
   .regex(/^[a-z0-9-]+(\.[a-z0-9-]+)*$/, 'Use letras minúsculas, números e hífen.')
 export const passwordSchema = z
   .string()
   .min(8, 'A senha deve ter pelo menos 8 caracteres.')
+  .max(128, 'Máximo de 128 caracteres.')
   .regex(/[A-Za-z]/, 'A senha deve conter letras e números.')
   .regex(/\d/, 'A senha deve conter letras e números.')
 export const networkSchema = z.enum(['ethereum', 'polygon', 'solana'], { message: 'Selecione uma rede.' })
@@ -33,6 +35,7 @@ export const walletSchema = z.object({
   ensOrSecondary: z
     .string()
     .trim()
+    .max(100, 'Máximo de 100 caracteres.')
     .refine((v) => !v || /^0x[a-fA-F0-9]{40}$/.test(v) || /^[a-z0-9-]+(\.[a-z0-9-]+)*\.eth$/.test(v), 'Informe um nome ENS (ex.: nome.eth) ou endereço 0x.'),
   provider: providerSchema,
   referralCode: z
@@ -70,7 +73,7 @@ export const checkoutSchema = z.object({
   username: usernameSchema,
   network: networkSchema,
   profileName: required('Informe o nome do perfil.'),
-  ensOrSecondary: z.string().trim(),
+  ensOrSecondary: z.string().trim().max(100, 'Máximo de 100 caracteres.'),
   provider: providerSchema,
   referralCode: z
     .string()
@@ -85,7 +88,7 @@ export type CheckoutForm = z.infer<typeof checkoutSchema>
 
 export const loginSchema = z.object({
   email: emailSchema,
-  password: z.string().min(1, 'Informe sua senha.'),
+  password: z.string().min(1, 'Informe sua senha.').max(128, 'Máximo de 128 caracteres.'),
 })
 
 export const signupSchema = z

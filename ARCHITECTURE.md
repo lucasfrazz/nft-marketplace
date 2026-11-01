@@ -208,3 +208,29 @@ Com um backend real, o item 1 desaparece e o 2 cai para a latência da rede. Nã
 - A quantidade máxima no detalhe considera o que já está no carrinho.
 - O checkout exige três passos explícitos: **conectar a carteira**, **revisar** e **confirmar e pagar**. Uma mudança de valores em qualquer momento exige nova confirmação.
 - A sessão expirada no meio do checkout leva ao login e devolve à mesma tela com o rascunho preenchido.
+
+## 14. Segurança
+
+Coberto pelos testes em `e2e/14-security.spec.ts`.
+
+| Área | Medida |
+| --- | --- |
+| Senhas | PBKDF2-SHA256 com 210.000 iterações (OWASP) e salt aleatório de 16 bytes por usuário. Comparação em tempo constante. As contas de demonstração ficam nas fixtures **só como hash**, e a senha fictícia aparece apenas no README |
+| Login | Mensagem genérica ("e-mail ou senha incorretos"). Um hash é calculado mesmo para e-mail inexistente, para que o tempo de resposta não revele contas. **Bloqueio de 10 min após 5 falhas** por e-mail (`429 RATE_LIMITED`) |
+| Sessão | Token aleatório opaco. Expiração deslizante de 30 min e **duração máxima absoluta de 12 h**. O logout invalida o token no servidor e encerra as conexões Socket.IO do usuário. A troca de senha encerra as outras sessões |
+| Autorização | Rotas privadas protegidas no router e na API (`401`). Pedido de outro usuário responde `403`. Carrinho e favoritos isolados por usuário no servidor e no cache. Eventos `order.updated` são entregues e aceitos só para o dono |
+| Validação | Validação no cliente (zod) **e** no servidor, incluindo limites de tamanho de todos os campos de texto (`assertMaxLengths`), formatos (e-mail, endereço `0x`, ENS, códigos), inteiros positivos e avatar (só PNG/JPEG/WebP, até 1 MB) |
+| Integridade da compra | O preço nunca vem do cliente: o pedido referencia a cotação do servidor (`quoteId` + `fingerprint`), que é recalculada no envio. A chave de idempotência evita compra duplicada |
+| XSS | O React escapa todo conteúdo. Não há `dangerouslySetInnerHTML`, `eval` nem `innerHTML`. A **CSP** permite scripts só da própria origem |
+| Redirecionamento | O `redirect` pós-login aceita apenas caminhos internos. Bloqueia `//host`, `/\host`, URLs absolutas e caracteres de controle |
+| Cabeçalhos (Vercel e `vite preview`) | `Content-Security-Policy` (sem scripts inline ou externos, `frame-ancestors 'none'`, `object-src 'none'`), `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`, `Referrer-Policy`, `Permissions-Policy`, `Cross-Origin-Opener-Policy` e HSTS (Vercel) |
+| Links externos | `target="_blank"` sempre com `rel="noopener noreferrer"` |
+| Dependências | `npm audit --omit=dev`: **0 vulnerabilidades** no que vai para o navegador. Os avisos restantes são de ferramentas de desenvolvimento (Lighthouse, CLI do shadcn) que não entram no build |
+| Segredos | Nenhum segredo no repositório nem no histórico. O `.env` só tem URLs públicas. Source maps desativados em produção |
+
+**Limites desta demonstração.** Toda a "segurança de servidor" acima é **simulada no navegador** (MSW): demonstra o contrato e o comportamento esperados, mas não protege dados reais. Quem tem acesso ao navegador pode ler o banco simulado em `localStorage` e usar `window.__kurioMock`, que fica ativo só com `VITE_ENABLE_MOCKS=true`. Num backend real:
+
+- o token iria num cookie `HttpOnly` + `Secure` + `SameSite`, com proteção CSRF, em vez de `localStorage`;
+- o hash de senha seria Argon2id no servidor;
+- a limitação de tentativas seria feita por IP e por conta no servidor;
+- a troca de e-mail exigiria confirmação da senha atual.

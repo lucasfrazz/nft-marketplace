@@ -2,6 +2,12 @@ import { defineConfig, type Plugin } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import path from 'node:path'
+import { readFileSync } from 'node:fs'
+
+// Os mesmos cabeçalhos de segurança do deploy (vercel.json) valem no `vite preview`,
+// para que os testes E2E rodem com a CSP de produção.
+const vercel = JSON.parse(readFileSync(new URL('./vercel.json', import.meta.url), 'utf8')) as { headers: { source: string; headers: { key: string; value: string }[] }[] }
+const securityHeaders = Object.fromEntries(vercel.headers.find((h) => h.source === '/(.*)')!.headers.map((h) => [h.key, h.value]))
 
 /**
  * Embute o CSS (Tailwind, ~16 KB) no HTML de produção, removendo uma
@@ -43,7 +49,7 @@ export default defineConfig({
     },
   },
   server: { port: 5173 },
-  preview: { port: 4173 },
+  preview: { port: 4173, headers: securityHeaders },
   build: {
     target: 'es2022',
     sourcemap: false,

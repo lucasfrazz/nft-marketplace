@@ -17,6 +17,7 @@ import { toSocketIo } from '@mswjs/socket.io-binding'
 import type { NftUpdatedEvent, Order, OrderUpdatedEvent } from '@/api/contracts'
 import { db, nextSeq, save } from './db'
 import { hasScenario } from './config'
+import { SESSION_MAX_AGE_MS } from './http'
 import type { DbNft } from './fixtures'
 
 export const SOCKET_URL = (import.meta.env.VITE_SOCKET_URL as string | undefined) ?? 'wss://realtime.kurio.mock'
@@ -39,7 +40,7 @@ const realtime = ws.link(new RegExp(`^${escaped}(/|$)`))
 function resolveUser(token: unknown): string | null {
   if (typeof token !== 'string') return null
   const s = db.sessions[token]
-  if (!s || s.expiresAt < Date.now()) return null
+  if (!s || s.expiresAt < Date.now() || Date.now() - s.createdAt > SESSION_MAX_AGE_MS) return null
   return s.userId
 }
 

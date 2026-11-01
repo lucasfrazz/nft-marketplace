@@ -77,6 +77,7 @@ export const catalogHandlers = [
         const fields: Record<string, string> = {}
 
         const q = (p.get('q') ?? '').trim()
+        if (q.length > 80) fields.q = 'Busca muito longa (máximo de 80 caracteres).'
         const collections = (p.get('collections') ?? '').split(',').filter(Boolean) as CollectionId[]
         const networks = (p.get('networks') ?? '').split(',').filter(Boolean) as Network[]
         const tab = (p.get('tab') ?? 'all') as CatalogTab

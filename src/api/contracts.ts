@@ -31,6 +31,7 @@ export type ApiErrorCode =
   | 'COUPON_EXPIRED' // 422
   | 'WALLET_REJECTED' // 403
   | 'WALLET_NOT_CONNECTED' // 409
+  | 'RATE_LIMITED' // 429
   | 'TRANSIENT' // 503
   | 'INTERNAL' // 500
 

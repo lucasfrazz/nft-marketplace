@@ -2,7 +2,7 @@
 
 Implementação do desafio frontend **NFT Marketplace** (layout Figma "Frontend Challenge"): descoberta, compra e conta do colecionador, em desktop e mobile, com API REST e tempo real **simulados** (MSW + Socket.IO).
 
-- **Aplicação publicada:** _(URL da Vercel — ver seção [Deploy](#deploy))_
+- **Aplicação publicada:** https://kurio-nft-marketplace-gamma.vercel.app
 - **Arquitetura, contratos e decisões:** [ARCHITECTURE.md](ARCHITECTURE.md)
 - **Auditoria Lighthouse:** [lighthouse/SUMMARY.md](lighthouse/SUMMARY.md)
 
@@ -166,7 +166,7 @@ A performance mobile fica abaixo da meta (90) por causa do custo estrutural de r
 Vercel (`vercel.json`: build Vite, fallback SPA para acesso direto/refresh de qualquer rota, cache imutável de assets). O build publicado inclui os mocks e o tempo real.
 
 ```bash
-vercel deploy --prod
+npx vercel@latest deploy --prod
 ```
 
 ## Estrutura
